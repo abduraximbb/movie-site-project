@@ -5,14 +5,16 @@ import Header from "../../components/header/Header";
 import Footer from "../../components/footer/Footer";
 import imdb from "../../assets/images/imdb.png";
 import kinopoisk from "../../assets/images/kinopoisk.png";
-// import {} from "number-brm";
 import translate from "translate";
 import "./Detail.css";
 import Movies from "../../components/movies/Movies";
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Loading from "../loading/Loading";
+
 const Details = () => {
   const { id } = useParams();
-  const [data, setData] = useState(null);
+  // const [data, setData] = useState(null);
   const [similar, setSimilar] = useState([]);
   const [credits, setCredits] = useState(null);
   const [translatedCountries, setTranslatedCountries] = useState([]);
@@ -21,13 +23,17 @@ const Details = () => {
   const [translatedCasts, setTranslatedCasts] = useState([]);
   const navigate = useNavigate();
 
+  const queryClient = useQueryClient();
+  const { data, error, isPending,isLoading } = useQuery({
+    queryKey: ["movie"],
+    queryFn: () => request.get(`/movie/${id}`).then((res) => res.data),
+  });
+
   useEffect(() => {
-    // Ma'lumotlarni olish
-    request.get(`/movie/${id}`).then((res) => setData(res.data));
+    // request.get(`/movie/${id}`).then((res) => setData(res.data));
     request.get(`/movie/${id}/similar`).then((res) => setSimilar(res.data));
-    request.get(`/movie/${id}/credits`).then((res) => setCredits(res.data));
+    // request.get(`/movie/${id}/credits`).then((res) => setCredits(res.data));
   }, [id]);
-  console.log(credits);
 
   useEffect(() => {
     // Production mamlakatlarini tarjima qilish
@@ -94,7 +100,7 @@ const Details = () => {
     const translateOverviews = async () => {
       if (data?.overview) {
         const translatedOverview = await translate(data.overview, "ru");
-        setData({ ...data, overview: translatedOverview });
+        // setData({ ...data, overview: translatedOverview });
       }
     };
     translateOverviews();
@@ -109,7 +115,9 @@ const Details = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  return (
+  return isPending ? (
+    <Loading />
+  ) : (
     <div className="bg-secondary">
       <Header />
       <div className="flex flex-col items-center">
@@ -137,12 +145,14 @@ const Details = () => {
               />
             </svg>
           </button>
-          <div class="mt-96 absolute inset-0 flex flex-col items-center justify-center text-center text-white">
-            <h1 class="text-2xl md:text-5xl font-bold mb-4">{data?.title}</h1>
-            <p class="text-sm md:text-lg mb-6">
+          <div className="mt-96 absolute inset-0 flex flex-col items-center justify-center text-center text-white">
+            <h1 className="text-2xl md:text-5xl font-bold mb-4">
+              {data?.title}
+            </h1>
+            <p className="text-sm md:text-lg mb-6">
               2023 • Драма • 2ч 10мин • EN •
             </p>
-            <button class="bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-full shadow-lg">
+            <button className="bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-full shadow-lg">
               Купить билет
             </button>
           </div>

@@ -6,14 +6,15 @@ import Header from "../../components/header/Header";
 import Footer from "../../components/footer/Footer";
 import Genre from "../../components/genre/Genre";
 import Pagination from "@mui/material/Pagination";
+import LoadingMain from "../loading/LoadingMain";
 
 const Home = () => {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
   const [genres, setGenres] = useState(null);
   const [selectedGenre, setSelectedGenre] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  
   const handleChange = (event, value) => {
     setPage(value);
   };
@@ -23,26 +24,25 @@ const Home = () => {
     });
   }, []);
   useEffect(() => {
+    setLoading(true);
     request("/discover/movie", {
       params: {
         page,
         without_genres: "18,10749,99",
         with_genres: selectedGenre.join(","),
       },
-    }).then((res) => {
-      setData(res.data);
-    });
+    })
+      .then((res) => {
+        setData(res.data);
+      })
+      .finally(() => setLoading(false));
   }, [page, selectedGenre]);
-  return (
+  return loading ? (
+    <LoadingMain />
+  ) : (
     <div className="bg-black">
       <Header />
-      <Carousel data={data} />{" "}
-      {/* <Genre
-        data={genres}
-        setSelectedGenre={setSelectedGenre}
-        selectedGenre={selectedGenre}
-      /> */}
-      <Movies data={data} />
+      <Carousel data={data} /> <Movies data={data} />
       <div className="flex justify-center py-6">
         <Pagination
           page={page}
