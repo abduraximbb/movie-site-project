@@ -14,7 +14,7 @@ import Loading from "../loading/Loading";
 
 const Details = () => {
   const { id } = useParams();
-  // const [data, setData] = useState(null);
+  const [data, setData] = useState(null);
   const [similar, setSimilar] = useState([]);
   const [credits, setCredits] = useState(null);
   const [translatedCountries, setTranslatedCountries] = useState([]);
@@ -22,17 +22,23 @@ const Details = () => {
   const [translatedJobs, setTranslatedJobs] = useState([]);
   const [translatedCasts, setTranslatedCasts] = useState([]);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const queryClient = useQueryClient();
-  const { data, error, isPending,isLoading } = useQuery({
-    queryKey: ["movie"],
-    queryFn: () => request.get(`/movie/${id}`).then((res) => res.data),
-  });
+  // const { data:movie, error, isPending,isLoading } = useQuery({
+  //   queryKey: ["movie"],
+  //   queryFn: () => request.get(`/movie/${id}`).then((res) => res.data),
+  // });
 
   useEffect(() => {
-    // request.get(`/movie/${id}`).then((res) => setData(res.data));
+    setLoading(true);
+    request
+      .get(`/movie/${id}`)
+      .then((res) => setData(res.data))
+      .finally(() => setLoading(false));
     request.get(`/movie/${id}/similar`).then((res) => setSimilar(res.data));
-    // request.get(`/movie/${id}/credits`).then((res) => setCredits(res.data));
+    request.get(`/movie/${id}/credits`).then((res) => setCredits(res.data));
+    window.scrollTo(0,0);
   }, [id]);
 
   useEffect(() => {
@@ -80,27 +86,27 @@ const Details = () => {
     };
     translateCrew();
 
-    const translateCasts = async () => {
-      if (credits?.cast) {
-        const translatedCasts = await Promise.all(
-          credits.cast.map(async (member) => {
-            const translatedCharacter = await translate(member.character, "ru");
-            const translatedName = await translate(member.name, "ru");
-            return {
-              character: translatedCharacter,
-              name: translatedName,
-            };
-          })
-        );
-        setTranslatedCasts(translatedCasts);
-      }
-    };
-    translateCasts();
+    // const translateCasts = async () => {
+    //   if (credits?.cast) {
+    //     const translatedCasts = await Promise.all(
+    //       credits.cast.map(async (member) => {
+    //         const translatedCharacter = await translate(member.character, "ru");
+    //         const translatedName = await translate(member.name, "ru");
+    //         return {
+    //           character: translatedCharacter,
+    //           name: translatedName,
+    //         };
+    //       })
+    //     );
+    //     setTranslatedCasts(translatedCasts);
+    //   }
+    // };
+    // translateCasts();
 
     const translateOverviews = async () => {
       if (data?.overview) {
         const translatedOverview = await translate(data.overview, "ru");
-        // setData({ ...data, overview: translatedOverview });
+        setData({ ...data, overview: translatedOverview });
       }
     };
     translateOverviews();
@@ -115,11 +121,10 @@ const Details = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  return isPending ? (
+  return loading ? (
     <Loading />
   ) : (
     <div className="bg-secondary">
-      <Header />
       <div className="flex flex-col items-center">
         <div className="w-[1360px] h-[640px] relative">
           <img
@@ -228,7 +233,6 @@ const Details = () => {
       </div>
 
       <Movies isDetail={true} data={similar} />
-      <Footer />
     </div>
   );
 };

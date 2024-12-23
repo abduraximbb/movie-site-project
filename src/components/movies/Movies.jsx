@@ -8,12 +8,16 @@ import "../carousel/Swiper.css";
 
 import { Navigation } from "swiper/modules";
 import { Link } from "react-router-dom";
+import DataNotFound from "@/pages/notFound/DataNotFound";
 
-const Movies = ({ data ,isDetail}) => {
-  console.log(data);
-  return (
+
+const Movies = ({ data, isDetail }) => {
+  
+  return data?.results?.length===0 ? (
+    <DataNotFound/>
+  ) : (
     <div>
-      <div className=" relative flex gap-2 justify-center flex-wrap container mt-24">
+      <div className=" relative flex gap-2 justify-center flex-wrap container pt-12">
         {isDetail ? (
           <h3 className="text-white text-xl absolute left-7 -top-10">
             На неделе
@@ -22,7 +26,10 @@ const Movies = ({ data ,isDetail}) => {
           ""
         )}
         {isDetail ? (
-          <Link to={"/"} className="text-primary text-lg absolute right-7 -top-10">
+          <Link
+            to={"/"}
+            className="text-primary text-lg absolute right-7 -top-10"
+          >
             {"Показать все >"}
           </Link>
         ) : (
@@ -38,7 +45,7 @@ const Movies = ({ data ,isDetail}) => {
         >
           {data.results?.map((item, index) => (
             <SwiperSlide key={index} className="rounded-xl">
-              <MovieItem {...item} />
+              <MovieItem item={item} />
             </SwiperSlide>
           ))}
         </Swiper>
