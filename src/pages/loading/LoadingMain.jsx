@@ -2,7 +2,7 @@ import React from "react";
 
 const LoadingMain = () => {
   return (
-    <div>
+    <div className="bg-black">
       <div className=" flex flex-wrap items-center justify-around py-4 bg-slate-200 w-full">
         <div className="w-full h-[36px]"></div>
       </div>
