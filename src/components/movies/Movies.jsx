@@ -10,11 +10,9 @@ import { Navigation } from "swiper/modules";
 import { Link } from "react-router-dom";
 import DataNotFound from "@/pages/notFound/DataNotFound";
 
-
 const Movies = ({ data, isDetail }) => {
-  
-  return data?.results?.length===0 ? (
-    <DataNotFound/>
+  return data?.results?.length === 0 ? (
+    <DataNotFound />
   ) : (
     <div>
       <div className=" relative flex gap-2 justify-center flex-wrap container pt-12">
@@ -43,7 +41,7 @@ const Movies = ({ data, isDetail }) => {
           modules={[Navigation]}
           className="CardSwiper"
         >
-          {data.results?.map((item, index) => (
+          {data?.results?.map((item, index) => (
             <SwiperSlide key={index} className="rounded-xl">
               <MovieItem item={item} />
             </SwiperSlide>
